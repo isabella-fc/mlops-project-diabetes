@@ -3,7 +3,11 @@
 from kedro.framework.project import find_pipelines
 from kedro.pipeline import Pipeline
 
-from mlops_project.pipelines import ingestion as data_ingestion
+from mlops_project.pipelines import (
+    ingestion as data_ingestion,
+    feature_selection
+
+    )
 
 
 def register_pipelines() -> dict[str, Pipeline]:
@@ -14,4 +18,7 @@ def register_pipelines() -> dict[str, Pipeline]:
     """
     ingestion_pipeline = data_ingestion.create_pipeline()
 
-    return {"ingestion": ingestion_pipeline}
+    return {
+        "ingestion": ingestion_pipeline,
+        "feature_selection": feature_selection.create_pipeline(),
+        }
