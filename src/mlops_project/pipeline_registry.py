@@ -3,6 +3,8 @@
 from kedro.framework.project import find_pipelines
 from kedro.pipeline import Pipeline
 
+from mlops_project.pipelines import ingestion as data_ingestion
+
 
 def register_pipelines() -> dict[str, Pipeline]:
     """Register the project's pipelines.
@@ -10,6 +12,6 @@ def register_pipelines() -> dict[str, Pipeline]:
     Returns:
         A mapping from pipeline names to ``Pipeline`` objects.
     """
-    pipelines = find_pipelines()
-    pipelines["__default__"] = sum(pipelines.values())
-    return pipelines
+    ingestion_pipeline = data_ingestion.create_pipeline()
+
+    return {"ingestion": ingestion_pipeline}
