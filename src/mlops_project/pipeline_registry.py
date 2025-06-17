@@ -7,7 +7,8 @@ from mlops_project.pipelines import (
     ingestion as data_ingestion,
     feature_selection,
     split_data,
-    data_preprocessing
+    data_preprocessing,
+    feature_engineering
     )
 
 
@@ -22,7 +23,7 @@ def register_pipelines() -> dict[str, Pipeline]:
 
     return {
         "ingestion": ingestion_pipeline,
-        "feature_selection": feature_selection.create_pipeline(),
         "split_data": split_data.create_pipeline(),
-        "data_preprocessing": data_preprocessing.create_pipeline()
-        }
+        "data_preprocessing": data_preprocessing.create_pipeline(),
+        "feature_engineering": feature_engineering.create_pipeline(),
+        "feature_selection": feature_selection.create_pipeline()}
