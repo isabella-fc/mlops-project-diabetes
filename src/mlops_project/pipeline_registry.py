@@ -6,8 +6,8 @@ from kedro.pipeline import Pipeline
 from mlops_project.pipelines import (
     ingestion as data_ingestion,
     feature_selection,
-    split_data
-
+    split_data,
+    data_preprocessing
     )
 
 
@@ -18,11 +18,11 @@ def register_pipelines() -> dict[str, Pipeline]:
         A mapping from pipeline names to ``Pipeline`` objects.
     """
     ingestion_pipeline = data_ingestion.create_pipeline()
-    split_pipeline = split_data.create_pipeline()
 
 
     return {
         "ingestion": ingestion_pipeline,
         "feature_selection": feature_selection.create_pipeline(),
-        "split_data": split_data.create_pipeline()
+        "split_data": split_data.create_pipeline(),
+        "data_preprocessing": data_preprocessing.create_pipeline()
         }
