@@ -8,7 +8,8 @@ from mlops_project.pipelines import (
     feature_selection,
     split_data,
     data_preprocessing,
-    feature_engineering
+    feature_engineering,
+    model_train
     )
 
 
@@ -26,4 +27,7 @@ def register_pipelines() -> dict[str, Pipeline]:
         "split_data": split_data.create_pipeline(),
         "data_preprocessing": data_preprocessing.create_pipeline(),
         "feature_engineering": feature_engineering.create_pipeline(),
-        "feature_selection": feature_selection.create_pipeline()}
+        "feature_selection": feature_selection.create_pipeline(),
+        "model_train": model_train.create_pipeline(),
+    
+        }

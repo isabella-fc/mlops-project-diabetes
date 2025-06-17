@@ -8,7 +8,7 @@ patients:
 
 ingested_data:
   type: pandas.CSVDataset
-  filepath: data/02_intermediate/ingested_data.parquet
+  filepath: data/02_intermediate/ingested_data.csv
 
 
 ### Feature Selection Pipeline
@@ -24,3 +24,41 @@ model_input_target:
 selected_features:
   type: pickle.PickleDataSet
   filepath: data/06_models/selected_features.pkl
+
+
+### Model Training Pipeline
+X_train:
+  type: kedro_datasets.pandas.CSVDataSet
+  filepath: data/05_model_input/X_train.csv
+
+X_test:
+  type: kedro_datasets.pandas.CSVDataSet
+  filepath: data/05_model_input/X_test.csv
+
+y_train:
+  type: kedro_datasets.pandas.CSVDataSet
+  filepath: data/05_model_input/y_train.csv
+
+y_test:
+  type: kedro_datasets.pandas.CSVDataSet
+  filepath: data/05_model_input/y_test.csv
+
+selected_features:
+  type: pickle.PickleDataSet
+  filepath: data/06_models/selected_features.pkl
+
+trained_model:
+  type: pickle.PickleDataSet
+  filepath: data/06_models/final_model.pkl
+
+final_features:
+  type: pickle.PickleDataSet
+  filepath: data/06_models/final_features.pkl
+
+train_metrics:
+  type: json.JSONDataSet
+  filepath: data/08_reporting/train_metrics.json
+
+shap_summary_plot:
+  type: matplotlib.MatplotlibWriter
+  filepath: data/08_reporting/shap_summary_plot.png
