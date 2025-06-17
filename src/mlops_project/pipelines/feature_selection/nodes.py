@@ -27,6 +27,10 @@ def feature_selection(X_train: pd.DataFrame, y_train: pd.DataFrame, parameters: 
         X_cols = X_train.columns[f].tolist()
     else:
         raise ValueError("Unsupported feature_selection method: only 'rfe' is currently implemented.")
+    
+    # hopswrok later
+    pd.Series(X_cols).to_csv("data/06_selected_features/selected_features_list.csv", index=False)
+
 
     log.info(f"Number of best columns is: {len(X_cols)}")
     return X_cols

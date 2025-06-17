@@ -1,64 +1,92 @@
-
-
 ### Ingestion Pipeline
 
 patients:
   type: pandas.CSVDataset
-  filepath: data/01_raw/diabetes_012_health_indicators_BRFSS2015.csv
+  filepath: data/01_raw/diabetes_012_health_indicators_BRFSS2015_sample.csv
 
 ingested_data:
   type: pandas.CSVDataset
-  filepath: data/02_intermediate/ingested_data.csv
+  filepath: data/02_validated/ingested_data.csv
+
+
+### Split Data Pipeline
+
+X_train:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/03_split/X_train.csv
+
+X_val:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/03_split/X_val.csv
+
+X_test:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/03_split/X_test.csv
+
+y_train:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/03_split/y_train.csv
+
+y_val:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/03_split/y_val.csv
+
+y_test:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/03_split/y_test.csv
+
+
+### Preprocessing Pipeline
+
+X_train_processed:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/04_preprocessed/X_train_processed.csv
+
+X_val_processed:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/04_preprocessed/X_val_processed.csv
+
+X_test_processed:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/04_preprocessed/X_test_processed.csv
+
+
+### Feature Engineering Pipeline
+
+X_train_fe:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/05_features/X_train_fe.csv
+
+X_val_fe:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/05_features/X_val_fe.csv
+
+X_test_fe:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/05_features/X_test_fe.csv
 
 
 ### Feature Selection Pipeline
 
-model_input_table:
-  type: pandas.CSVDataSet
-  filepath: data/05_model_input/X.csv
-
-model_input_target:
-  type: pandas.CSVDataSet
-  filepath: data/05_model_input/y.csv
-
 selected_features:
-  type: pickle.PickleDataSet
-  filepath: data/06_models/selected_features.pkl
+  type: pickle.PickleDataset
+  filepath: data/06_selected_features/selected_features.pkl
 
 
 ### Model Training Pipeline
-X_train:
-  type: kedro_datasets.pandas.CSVDataSet
-  filepath: data/05_model_input/X_train.csv
-
-X_test:
-  type: kedro_datasets.pandas.CSVDataSet
-  filepath: data/05_model_input/X_test.csv
-
-y_train:
-  type: kedro_datasets.pandas.CSVDataSet
-  filepath: data/05_model_input/y_train.csv
-
-y_test:
-  type: kedro_datasets.pandas.CSVDataSet
-  filepath: data/05_model_input/y_test.csv
-
-selected_features:
-  type: pickle.PickleDataSet
-  filepath: data/06_models/selected_features.pkl
 
 trained_model:
-  type: pickle.PickleDataSet
-  filepath: data/06_models/final_model.pkl
+  type: pickle.PickleDataset
+  filepath: data/07_models/final_model.pkl
 
 final_features:
-  type: pickle.PickleDataSet
-  filepath: data/06_models/final_features.pkl
+  type: pickle.PickleDataset
+  filepath: data/07_models/final_features.pkl
 
 train_metrics:
-  type: json.JSONDataSet
-  filepath: data/08_reporting/train_metrics.json
+  type: json.JSONDataset
+  filepath: data/09_reporting/train_metrics.json
 
 shap_summary_plot:
   type: matplotlib.MatplotlibWriter
-  filepath: data/08_reporting/shap_summary_plot.png
+  filepath: data/09_reporting/shap_summary_plot.png

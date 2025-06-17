@@ -1,8 +1,8 @@
 import pandas as pd
 
-def new_features(data: pd.DataFrame) -> pd.DataFrame:
-    df = data.copy()
-    # Confirmar se o Max BMI vai ser com ou sem os outliers
+def add_engineered_features(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+
     df["HealthIndex"] = (
         df["BMI"] / df["BMI"].max() +
         df["GenHlth"] / 5 +
@@ -22,7 +22,7 @@ def new_features(data: pd.DataFrame) -> pd.DataFrame:
     df["Mental_Physical_Gap"] = df["MentHlth"] - df["PhysHlth"]
 
     df["AccessIssues"] = (1 - df["AnyHealthcare"]) + df["NoDocbcCost"]
-    # Idk se isto tá certo, é kinda o que estamos a prever iodshapihf
+
     df["DiabetesRiskComposite"] = (
         df["HighBP"] +
         df["HighChol"] +
@@ -32,3 +32,15 @@ def new_features(data: pd.DataFrame) -> pd.DataFrame:
     )
 
     return df
+
+
+def new_features(
+    X_train_processed: pd.DataFrame,
+    X_val_processed: pd.DataFrame,
+    X_test_processed: pd.DataFrame
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    return (
+        add_engineered_features(X_train_processed),
+        add_engineered_features(X_val_processed),
+        add_engineered_features(X_test_processed)
+    )

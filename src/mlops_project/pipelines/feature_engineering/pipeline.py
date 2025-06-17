@@ -5,8 +5,8 @@ def create_pipeline(**kwargs) -> Pipeline:
     return pipeline([
         node(
             func=new_features,
-            inputs="preprocessed_data",
-            outputs="engineered_data",
+            inputs=["X_train_processed", "X_val_processed", "X_test_processed"],
+            outputs=["X_train_fe", "X_val_fe", "X_test_fe"],
             name="engineer_features_node"
         )
     ])

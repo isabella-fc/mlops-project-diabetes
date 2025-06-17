@@ -29,5 +29,14 @@ def register_pipelines() -> dict[str, Pipeline]:
         "feature_engineering": feature_engineering.create_pipeline(),
         "feature_selection": feature_selection.create_pipeline(),
         "model_train": model_train.create_pipeline(),
-    
+
+
+        "__default__": (
+            ingestion_pipeline +
+            split_data.create_pipeline() +
+            data_preprocessing.create_pipeline() +
+            feature_engineering.create_pipeline() +
+            feature_selection.create_pipeline() +
+            model_train.create_pipeline()
+        )
         }

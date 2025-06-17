@@ -6,10 +6,10 @@ def create_pipeline(**kwargs) -> Pipeline:
         node(
             func=model_train,
             inputs=[
-                "X_train",
-                "X_test",
+                "X_train_fe",
+                "X_val_fe",
                 "y_train",
-                "y_test",
+                "y_val",
                 "params:train",
                 "selected_features"
             ],
@@ -17,7 +17,7 @@ def create_pipeline(**kwargs) -> Pipeline:
                 "trained_model",
                 "final_features",
                 "train_metrics",
-                "shap_summary_plot"
+                #"shap_summary_plot"
             ],
             name="model_train_node"
         )

@@ -1,15 +1,27 @@
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
-def preprocess_data(data: pd.DataFrame) -> pd.DataFrame:
-    df = data.copy()
-    # Explorar mais, testezinho para ver whatzappenings
-    # Remove extreme outliers in the 'BMI' column
-    df = df[df["BMI"] < 80]
+def preprocess_data(
+    X_train: pd.DataFrame,
+    X_val: pd.DataFrame,
+    X_test: pd.DataFrame
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
 
-    # Normalize columns using StandardScaler
+    # Copy inputs to avoid modifying originals
+    X_train_copy = X_train.copy()
+    X_val_copy = X_val.copy()
+    X_test_copy = X_test.copy()
+
+    # Drop extreme outliers in training set only
+    X_train_copy = X_train_copy[X_train_copy["BMI"] < 80]
+
+    # Define columns to scale
     columns_to_scale = ["BMI", "MentHlth", "PhysHlth", "Age"]
-    scaler = StandardScaler()
-    df[columns_to_scale] = scaler.fit_transform(df[columns_to_scale])
 
-    return df
+    # Fit scaler only on training data
+    scaler = StandardScaler()
+    X_train_copy[columns_to_scale] = scaler.fit_transform(X_train_copy[columns_to_scale])
+    X_val_copy[columns_to_scale] = scaler.transform(X_val_copy[columns_to_scale])
+    X_test_copy[columns_to_scale] = scaler.transform(X_test_copy[columns_to_scale])
+
+    return X_train_copy, X_val_copy, X_test_copy

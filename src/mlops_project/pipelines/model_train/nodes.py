@@ -17,9 +17,9 @@ logger = logging.getLogger(__name__)
 
 def model_train(
     X_train: pd.DataFrame, 
-    X_test: pd.DataFrame, 
+    X_val: pd.DataFrame, 
     y_train: pd.DataFrame, 
-    y_test: pd.DataFrame,
+    y_val: pd.DataFrame,
     parameters: Dict[str, Any],
     best_columns: list[str]
 ) -> Tuple[object, list[str], dict, plt.Figure]:
@@ -42,27 +42,27 @@ def model_train(
     with mlflow.start_run(experiment_id=experiment_id, nested=True):
         if parameters.get("use_feature_selection", False):
             X_train = X_train[best_columns]
-            X_test = X_test[best_columns]
+            X_val = X_val[best_columns]
 
         y_train = np.ravel(y_train)
         model = classifier.fit(X_train, y_train)
 
         # Metrics
         y_train_pred = model.predict(X_train)
-        y_test_pred = model.predict(X_test)
+        y_val_pred = model.predict(X_val)
         acc_train = accuracy_score(y_train, y_train_pred)
-        acc_test = accuracy_score(y_test, y_test_pred)
+        acc_val = accuracy_score(y_val, y_val_pred)
 
         results_dict['classifier'] = classifier.__class__.__name__
         results_dict['train_score'] = acc_train
-        results_dict['test_score'] = acc_test
+        results_dict['val_score'] = acc_val
 
-        logger.info(f"Model trained. Accuracy on test: {acc_test:.4f}")
+        logger.info(f"Model trained. Accuracy on test: {acc_val:.4f}")
 
-        # SHAP summary plot
-        explainer = shap.TreeExplainer(model)
-        shap_values = explainer.shap_values(X_train)
-        fig = plt.figure()
-        shap.summary_plot(shap_values[1], X_train, feature_names=X_train.columns, show=False)
+        # # SHAP summary plot
+        # explainer = shap.TreeExplainer(model)
+        # shap_values = explainer.shap_values(X_train)
+        # fig = plt.figure()
+        # shap.summary_plot(shap_values[1], X_train, feature_names=X_train.columns, show=False)
 
-        return model, list(X_train.columns), results_dict, fig
+        return model, list(X_train.columns), results_dict #fig
