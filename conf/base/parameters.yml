@@ -1,4 +1,11 @@
 # this look a bit random right now, but it will be used to generate the parameters for the model
+
+
+ingestion:
+  target_column: "Diabetes_012"
+
+to_feature_store: True
+
 feature_selection:
   feature_selection: "rfe"
   baseline_model_params:
@@ -13,3 +20,4 @@ train:
     n_estimators: 100
     max_depth: 6
     random_state: 42
+
