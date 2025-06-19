@@ -10,7 +10,11 @@ from sklearn.feature_selection import RFE
 
 def feature_selection(X_train: pd.DataFrame, y_train: pd.DataFrame, parameters: Dict[str, Any]) -> list[str]:
     log = logging.getLogger(__name__)
-    log.info(f"We start with: {len(X_train.columns)} columns")
+    log.info(f"Received {len(X_train.columns)} columns before filtering")
+
+    # Drop datetime (created for hopswork)
+    X_train = X_train.drop(columns=["datetime"], errors="ignore")
+    log.info(f"Using {len(X_train.columns)} columns for feature selection")
 
     if parameters["feature_selection"] == "rfe":
         y_train = np.ravel(y_train)
@@ -21,16 +25,13 @@ def feature_selection(X_train: pd.DataFrame, y_train: pd.DataFrame, parameters: 
         except:
             classifier = RandomForestClassifier(**parameters['baseline_model_params'])
 
-        rfe = RFE(classifier) 
+        rfe = RFE(classifier)
         rfe = rfe.fit(X_train, y_train)
-        f = rfe.get_support(1)  # most important features
+        f = rfe.get_support(1)  # selected features
         X_cols = X_train.columns[f].tolist()
     else:
         raise ValueError("Unsupported feature_selection method: only 'rfe' is currently implemented.")
-    
-    # hopswrok later
+
     pd.Series(X_cols).to_csv("data/06_selected_features/selected_features_list.csv", index=False)
-
-
-    log.info(f"Number of best columns is: {len(X_cols)}")
+    log.info(f"Selected {len(X_cols)} best features")
     return X_cols
