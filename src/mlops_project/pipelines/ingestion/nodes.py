@@ -183,45 +183,45 @@ def ingest_data(
             raise ValueError("Great Expectations validation failed.")
     logger.info("GE validation passed.")
 
-    # Store in Hopsworks if flag is set
-    if parameters.get("to_feature_store", True):
-        from pathlib import Path
-        from kedro.config import OmegaConfigLoader
-        from kedro.framework.project import settings
+    # # Store in Hopsworks if flag is set
+    # if parameters.get("to_feature_store", True):
+    #     from pathlib import Path
+    #     from kedro.config import OmegaConfigLoader
+    #     from kedro.framework.project import settings
 
-        conf_path = str(Path("") / settings.CONF_SOURCE)
-        conf_loader = OmegaConfigLoader(conf_source=conf_path)
-        credentials_input = conf_loader["credentials"]["feature_store"]
+    #     conf_path = str(Path("") / settings.CONF_SOURCE)
+    #     conf_loader = OmegaConfigLoader(conf_source=conf_path)
+    #     credentials_input = conf_loader["credentials"]["feature_store"]
 
 
-        to_feature_store(
-            data=df_numerical,
-            group_name="numerical_features",
-            feature_group_version=1,
-            description="Numerical features from diabetes dataset",
-            group_description=[],
-            validation_expectation_suite=build_expectation_suite("numerical_suite", "numerical_features", df_numerical.columns.tolist()),
-            credentials_input=credentials_input
-        )
+    #     to_feature_store(
+    #         data=df_numerical,
+    #         group_name="numerical_features",
+    #         feature_group_version=1,
+    #         description="Numerical features from diabetes dataset",
+    #         group_description=[],
+    #         validation_expectation_suite=build_expectation_suite("numerical_suite", "numerical_features", df_numerical.columns.tolist()),
+    #         credentials_input=credentials_input
+    #     )
 
-        to_feature_store(
-            data=df_binary,
-            group_name="binary_features",
-            feature_group_version=1,
-            description="Binary features from diabetes dataset",
-            group_description=[],
-            validation_expectation_suite=build_expectation_suite("binary_suite", "binary_features", df_binary.columns.tolist()),
-            credentials_input=credentials_input
-        )
+    #     to_feature_store(
+    #         data=df_binary,
+    #         group_name="binary_features",
+    #         feature_group_version=1,
+    #         description="Binary features from diabetes dataset",
+    #         group_description=[],
+    #         validation_expectation_suite=build_expectation_suite("binary_suite", "binary_features", df_binary.columns.tolist()),
+    #         credentials_input=credentials_input
+    #     )
 
-        to_feature_store(
-            data=df_target,
-            group_name="target_features",
-            feature_group_version=1,
-            description="Target variable from diabetes dataset",
-            group_description=[],
-            validation_expectation_suite=build_expectation_suite("target_suite", "target", df_target.columns.tolist()),
-            credentials_input=credentials_input
-        )
+    #     to_feature_store(
+    #         data=df_target,
+    #         group_name="target_features",
+    #         feature_group_version=1,
+    #         description="Target variable from diabetes dataset",
+    #         group_description=[],
+    #         validation_expectation_suite=build_expectation_suite("target_suite", "target", df_target.columns.tolist()),
+    #         credentials_input=credentials_input
+    #     )
 
     return df_full

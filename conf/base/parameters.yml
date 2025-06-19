@@ -4,7 +4,7 @@
 ingestion:
   target_column: "Diabetes_012"
 
-to_feature_store: True
+to_feature_store: False
 
 feature_selection:
   feature_selection: "rfe"

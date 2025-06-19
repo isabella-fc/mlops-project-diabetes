@@ -90,3 +90,12 @@ train_metrics:
 shap_summary_plot:
   type: matplotlib.MatplotlibWriter
   filepath: data/09_reporting/shap_summary_plot.png
+
+
+### Profiling
+
+output_plot:
+  type: kedro_mlflow.io.artifacts.MlflowArtifactDataset
+  dataset:
+    type: matplotlib.MatplotlibWriter
+    filepath: data/08_reporting/shap_plot.png

@@ -17,7 +17,7 @@ def create_pipeline(**kwargs) -> Pipeline:
                 "trained_model",
                 "final_features",
                 "train_metrics",
-                #"shap_summary_plot"
+                "output_plot"
             ],
             name="model_train_node"
         )
