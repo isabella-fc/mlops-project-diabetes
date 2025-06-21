@@ -72,6 +72,17 @@ selected_features:
   type: pickle.PickleDataset
   filepath: data/06_selected_features/selected_features.pkl
 
+### Data Unit Tests Pipeline
+
+expectation_suite:
+  type: pickle.PickleDataset
+  filepath: data/01_raw/expectation_suite.pkl
+
+validation_report:
+  type: json.JSONDataset
+  filepath: data/09_reporting/validation_report.json
+
+
 
 ### Model Training Pipeline
 

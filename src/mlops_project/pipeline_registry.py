@@ -9,7 +9,8 @@ from mlops_project.pipelines import (
     split_data,
     data_preprocessing,
     feature_engineering,
-    model_train
+    model_train,
+    data_units_tests
     )
 
 
@@ -29,6 +30,7 @@ def register_pipelines() -> dict[str, Pipeline]:
         "feature_engineering": feature_engineering.create_pipeline(),
         "feature_selection": feature_selection.create_pipeline(),
         "model_train": model_train.create_pipeline(),
+        "data_units_tests": data_units_tests.create_pipeline(),
 
 
         "__default__": (
@@ -37,6 +39,7 @@ def register_pipelines() -> dict[str, Pipeline]:
             data_preprocessing.create_pipeline() +
             feature_engineering.create_pipeline() +
             feature_selection.create_pipeline() +
-            model_train.create_pipeline()
+            model_train.create_pipeline() +
+            data_units_tests.create_pipeline()
         )
         }
