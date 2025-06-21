@@ -4,7 +4,7 @@ import logging
 import great_expectations as ge
 from typing import Dict, Any
 from great_expectations.core import ExpectationSuite
-
+import pickle
 
 from pathlib import Path
 
@@ -16,6 +16,13 @@ conf_loader = OmegaConfigLoader(conf_source=conf_path)
 credentials = conf_loader["credentials"]
 
 logger = logging.getLogger(__name__)
+
+
+def save_expectation_suite(expectation_suite: ExpectationSuite, filename: str):
+    path = Path("data/01_raw") / filename
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "wb") as f:
+        pickle.dump(expectation_suite, f)
 
 
 def build_expectation_suite(expectation_suite_name: str, feature_group: str, available_columns: list[str]) -> ExpectationSuite:
@@ -173,9 +180,9 @@ def ingest_data(
     import great_expectations as ge
     ge_df = ge.from_pandas(df_full)
     for suite in [
-        build_expectation_suite("numerical_suite", "numerical_features", df_numerical.columns.tolist()),
-        build_expectation_suite("binary_suite", "binary_features", df_binary.columns.tolist()),
-        build_expectation_suite("target_suite", "target", df_target.columns.tolist())
+        save_expectation_suite(build_expectation_suite("numerical_suite", "numerical_features", df_numerical.columns.tolist()), "numerical_suite.pkl"),
+        save_expectation_suite(build_expectation_suite("binary_suite", "binary_features", df_binary.columns.tolist()), "binary_suite.pkl"),
+        save_expectation_suite(build_expectation_suite("target_suite", "target", df_target.columns.tolist()), "target_suite.pkl")
     ]:
         result = ge_df.validate(expectation_suite=suite)
         if not result.success:

@@ -21,3 +21,5 @@ train:
     max_depth: 6
     random_state: 42
 
+
+data_drift_report_path: "data/08_reporting/data_drift_report.html"
