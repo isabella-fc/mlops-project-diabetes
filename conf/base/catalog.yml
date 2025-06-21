@@ -74,10 +74,6 @@ selected_features:
 
 ### Data Unit Tests Pipeline
 
-expectation_suite:
-  type: pickle.PickleDataset
-  filepath: data/01_raw/expectation_suite.pkl
-
 validation_report:
   type: json.JSONDataset
   filepath: data/09_reporting/validation_report.json
