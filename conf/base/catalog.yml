@@ -50,6 +50,12 @@ X_test_processed:
   type: kedro_datasets.pandas.CSVDataset
   filepath: data/04_preprocessed/X_test_processed.csv
 
+y_train_balanced:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/04_preprocessed/y_train_balanced.csv
+  save_args:
+    index: False
+
 
 ### Feature Engineering Pipeline
 
@@ -71,6 +77,15 @@ X_test_fe:
 selected_features:
   type: pickle.PickleDataset
   filepath: data/06_selected_features/selected_features.pkl
+
+### Model Selection Pipeline
+champion_dict:
+  type: pickle.PickleDataset
+  filepath: data/07_models/champion_dict.pkl
+
+champion_model:
+  type: pickle.PickleDataset
+  filepath: data/07_models/champion_model.pkl
 
 ### Data Unit Tests Pipeline
 

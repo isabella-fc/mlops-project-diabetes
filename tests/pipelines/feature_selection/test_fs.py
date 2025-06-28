@@ -36,7 +36,6 @@ def test_feature_selection_rfe_selects_features(mock_open, mock_pickle):
 
         selected = feature_selection(X, y, params)
 
-
     assert isinstance(selected, list)
     assert all(isinstance(f, str) for f in selected)
     assert "datetime" not in selected  # dropped

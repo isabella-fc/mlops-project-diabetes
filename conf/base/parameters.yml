@@ -23,4 +23,21 @@ train:
     max_depth: 6
     random_state: 42
 
+model_selection:
+  hyperparameters:
+    RandomForestClassifier:
+      n_estimators: [100, 200]
+      max_depth: [5, 10]
+    GradientBoostingClassifier:
+      n_estimators: [100, 150]
+      learning_rate: [0.05, 0.1]
+    LogisticRegression:
+      C: [0.1, 1.0]
+      solver: ['lbfgs']
+    XGBClassifier:
+      n_estimators: [50, 100]
+      max_depth: [3, 5]
+      learning_rate: [0.05, 0.1]
+
+
 data_drift_report_path: "data/08_reporting/data_drift_report.html"

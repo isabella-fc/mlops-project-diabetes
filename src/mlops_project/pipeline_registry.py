@@ -12,6 +12,7 @@ from mlops_project.pipelines import (
     model_train,
     data_units_tests,
     data_drift,
+    model_selection,
     )
 
 
@@ -33,6 +34,7 @@ def register_pipelines() -> dict[str, Pipeline]:
         "model_train": model_train.create_pipeline(),
         "data_units_tests": data_units_tests.create_pipeline(),
         "drift": data_drift.create_pipeline(),
+        "model_selection": model_selection.create_pipeline(),
 
 
         "__default__": (
@@ -42,6 +44,7 @@ def register_pipelines() -> dict[str, Pipeline]:
             data_preprocessing.create_pipeline() +
             feature_engineering.create_pipeline() +
             feature_selection.create_pipeline() +
+            model_selection.create_pipeline() +
             model_train.create_pipeline() +
             data_drift.create_pipeline()
         )

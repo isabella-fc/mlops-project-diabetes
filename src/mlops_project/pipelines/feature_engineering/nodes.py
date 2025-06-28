@@ -1,6 +1,7 @@
 import pandas as pd
 
 def add_engineered_features(df: pd.DataFrame) -> pd.DataFrame:
+
     df = df.copy()
 
     df["HealthIndex"] = (
