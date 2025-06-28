@@ -37,7 +37,7 @@ def feature_selection(X_train: pd.DataFrame, y_train: pd.DataFrame, parameters: 
     pd.Series(X_cols).to_csv("data/06_selected_features/selected_features_list.csv", index=False)
 
     selected_df = X_train[X_cols]
-    df_path = f"data/06_selected_features/current_dataset.csv"
+    df_path = f"data/06_selected_features/current_data.csv"
     selected_df.to_csv(df_path, index=False)
 
     log.info(f"Selected {len(X_cols)} best features")

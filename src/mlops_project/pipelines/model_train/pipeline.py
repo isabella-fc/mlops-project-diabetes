@@ -7,9 +7,9 @@ def create_pipeline(**kwargs) -> Pipeline:
             func=model_train,
             inputs=[
                 "X_train_fe",
-                "X_val_fe",
+                "X_test_fe",
                 "y_train_matched",
-                "y_val",
+                "y_test",
                 "params:train",
                 "selected_features"
             ],

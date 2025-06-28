@@ -7,7 +7,7 @@ def load_suite(suite_path: str):
     with open(suite_path, "rb") as f:
         return pickle.load(f)
 
-def data_unit_tests(df: pd.DataFrame, base_path: str = "data/01_raw") -> dict:
+def data_unit_tests(df: pd.DataFrame, base_path: str = "gx/expectations") -> dict:
     results = {}
 
     suite_files = {

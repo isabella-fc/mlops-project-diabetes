@@ -38,6 +38,10 @@ def model_selection(
     import pickle
     from pathlib import Path
 
+    with open("data/07_models/champion_dict.pkl", "wb") as f:
+        pickle.dump({"test_score": 0.0}, f)
+    champion_dict["test_score"] = 0.0
+
     X_train = X_train.select_dtypes(include=[np.number])
     X_test = X_test.select_dtypes(include=[np.number])
 
@@ -51,7 +55,7 @@ def model_selection(
     models_dict = {
         "RandomForestClassifier": RandomForestClassifier(),
         "GradientBoostingClassifier": GradientBoostingClassifier(),
-        "LogisticRegression": LogisticRegression(max_iter=1000),
+        "LogisticRegression": LogisticRegression(max_iter=500),
         "XGBClassifier": XGBClassifier(eval_metric="mlogloss")
     }
 

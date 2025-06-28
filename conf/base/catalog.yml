@@ -131,3 +131,26 @@ current_dataset:
   type: kedro_datasets.pandas.CSVDataset
   filepath: data/06_selected_features/current_dataset.csv
 
+current_data:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/06_selected_features/current_data.csv
+
+### Model predictions
+df_with_predict:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/07_model_output/predictions.csv
+  save_args:
+    pandas_kwargs:
+      index: false
+
+predict_describe:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/07_model_output/prediction_summary.csv
+  save_args:
+    pandas_kwargs:
+      index: false
+
+
+selected_features_list:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/06_selected_features/selected_features_list.csv

@@ -13,6 +13,8 @@ def test_preprocess_data_outlier_removal_and_scaling():
         "Other": [1, 2, 3]
     })
 
+    y_train = pd.DataFrame({"target": [0, 1, 2]}) 
+
     X_val = pd.DataFrame({
         "BMI": [25.0, 30.0],
         "MentHlth": [4, 1],
@@ -29,11 +31,12 @@ def test_preprocess_data_outlier_removal_and_scaling():
         "Other": [1]
     })
 
-    X_train_p, X_val_p, X_test_p = preprocess_data(X_train, X_val, X_test)
+    X_train_p, X_val_p, X_test_p, y_train_p = preprocess_data(X_train, X_val, X_test, y_train)
 
     # check outlier was removed from training set
     assert len(X_train_p) == 2
     assert not (X_train_p["BMI"] > 80).any()
+    assert len(y_train_p) == 2
 
     # check missing flag replacement
     assert not X_train_p.isna().any().any()
@@ -44,7 +47,7 @@ def test_preprocess_data_outlier_removal_and_scaling():
     assert np.allclose(X_train_p[["BMI", "MentHlth", "PhysHlth", "Age"]].mean(), 0, atol=1e-6)
     assert np.allclose(X_train_p[["BMI", "MentHlth", "PhysHlth", "Age"]].std(ddof=0), 1, atol=1e-6)
 
-    #check untouched column remains
+    # check untouched column remains
     assert "Other" in X_train_p.columns
 
 

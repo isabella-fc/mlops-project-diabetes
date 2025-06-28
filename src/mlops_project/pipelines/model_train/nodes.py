@@ -21,12 +21,14 @@ warnings.filterwarnings(action="ignore", category=DataConversionWarning)
 
 def model_train(
     X_train: pd.DataFrame, 
-    X_val: pd.DataFrame, 
+    X_test: pd.DataFrame, 
     y_train: pd.DataFrame, 
-    y_val: pd.DataFrame,
+    y_test: pd.DataFrame,
     parameters: Dict[str, Any],
     best_columns: list[str]
 ) -> Tuple[object, list[str], dict]:
+
+
 
     with open('conf/local/mlflow.yml') as f:
         experiment_name = yaml.load(f, Loader=yaml.loader.SafeLoader)['tracking']['experiment']['name']
@@ -46,35 +48,46 @@ def model_train(
     with mlflow.start_run(experiment_id=experiment_id, nested=True):
         if parameters.get("use_feature_selection", False):
             X_train = X_train[best_columns]
-            X_val = X_val[best_columns]
+            X_test = X_test[best_columns]
 
         y_train = y_train.values.ravel()
         model = classifier.fit(X_train, y_train)
 
         # Predictions
         y_train_pred = model.predict(X_train)
-        y_val_pred = model.predict(X_val)
+        y_test_pred = model.predict(X_test)
 
         # Metrics
         acc_train = accuracy_score(y_train, y_train_pred)
-        acc_val = accuracy_score(y_val, y_val_pred)
+        acc_test = accuracy_score(y_test, y_test_pred)
         f1_train = f1_score(y_train, y_train_pred, average="macro")
-        f1_val = f1_score(y_val, y_val_pred, average="macro")
+        f1_test = f1_score(y_test, y_test_pred, average="macro")
 
         results_dict["classifier"] = classifier.__class__.__name__
         results_dict["train_accuracy"] = acc_train
-        results_dict["val_accuracy"] = acc_val
+        results_dict["test_accuracy"] = acc_test
         results_dict["train_f1_macro"] = f1_train
-        results_dict["val_f1_macro"] = f1_val
+        results_dict["test_f1_macro"] = f1_test
 
-        logger.info(f"Train acc: {acc_train:.4f}, Val acc: {acc_val:.4f}")
-        logger.info(f"Train F1: {f1_train:.4f}, Val F1: {f1_val:.4f}")
+        logger.info(f"Train acc: {acc_train:.4f}, Test acc: {acc_test:.4f}")
+        logger.info(f"Train F1: {f1_train:.4f}, Test F1: {f1_test:.4f}")
 
         # Log metrics to MLflow
         mlflow.log_metric("train_accuracy", acc_train)
-        mlflow.log_metric("val_accuracy", acc_val)
+        mlflow.log_metric("test_accuracy", acc_test)
         mlflow.log_metric("train_f1_macro", f1_train)
-        mlflow.log_metric("val_f1_macro", f1_val)
+        mlflow.log_metric("test_f1_macro", f1_test)
+
+               
+        run_id = mlflow.active_run().info.run_id
+        metrics_plot = {
+            "Train Accuracy": acc_train,
+            "Test Accuracy": acc_test,
+            "Train F1": f1_train,
+            "Test F1": f1_test
+        }
+        plot_path = plot_model_metrics_bar(metrics_plot, run_id)
+        mlflow.log_artifact(str(plot_path), artifact_path="metric_plots")
 
         # SHAP analysis
         explainer = shap.Explainer(model)
@@ -96,6 +109,7 @@ def model_train(
                 plt.savefig(plot_path, bbox_inches="tight")
                 plt.close(fig)
                 mlflow.log_artifact(str(plot_path), artifact_path="shap_summary_plots")
+                
 
         else:
             logger.warning(
@@ -105,3 +119,48 @@ def model_train(
             
         return model, list(X_train.columns), results_dict, plt
 
+
+
+def plot_model_metrics_bar(metrics: dict, run_id: str, output_dir: str = "data/08_reporting/metrics") -> Path:
+    
+    fig, ax = plt.subplots()
+    ax.bar(metrics.keys(), metrics.values(), color=["blue", "blue", "green", "green"])
+    ax.set_ylim(0, 1)
+    ax.set_ylabel("Score")
+    ax.set_title("Model Performance Metrics")
+    plt.xticks(rotation=20)
+    plt.tight_layout()
+
+    output_path = Path(output_dir)
+    output_path.mkdir(parents=True, exist_ok=True)
+
+    plot_path = output_path / f"metrics_{run_id}.png"
+    plt.savefig(plot_path)
+    plt.close(fig)
+
+    return plot_path
+
+def plot_confusion_matrix(y_true, y_pred, labels, run_id, output_dir="data/08_reporting/confusion_matrix") -> Path:
+ 
+    cm = confusion_matrix(y_true, y_pred, labels=labels)
+    fig, ax = plt.subplots(figsize=(8, 6))
+    sns.heatmap(
+        cm,
+        annot=True,
+        fmt="d",
+        cmap="Blues",
+        xticklabels=labels,
+        yticklabels=labels
+    )
+    ax.set_xlabel("Predicted Labels")
+    ax.set_ylabel("True Labels")
+    ax.set_title("Confusion Matrix")
+    plt.tight_layout()
+
+    output_path = Path(output_dir)
+    output_path.mkdir(parents=True, exist_ok=True)
+    plot_path = output_path / f"confusion_matrix_{run_id}.png"
+    plt.savefig(plot_path)
+    plt.close(fig)
+
+    return plot_path
