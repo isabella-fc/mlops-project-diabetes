@@ -58,9 +58,10 @@ example_pipeline = "True"
 source_dir = "src"
 
 [tool.pytest.ini_options]
-addopts = """
---cov-report term-missing \
---cov src/mlops_project -ra"""
+addopts = "-ra -q --cov=src/mlops_project --cov-report=term-missing"
+testpaths = ["tests"]
+python_files = "test_*.py"
+pythonpath = "src"
 
 [tool.coverage.report]
 fail_under = 0

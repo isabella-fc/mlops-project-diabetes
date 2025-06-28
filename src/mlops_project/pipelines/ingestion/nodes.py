@@ -118,7 +118,7 @@ def ingest_data(
 
     logger.info(f"Loaded dataset with shape: {df_full.shape}")
 
-    # Detect numeric and binary features
+
     numerical_features = df_full.select_dtypes(include=["float64", "int64"]).columns.tolist()
     binary_features = [col for col in numerical_features if df_full[col].dropna().isin([0.0, 1.0]).all()]
     numerical_features = [col for col in numerical_features if col not in binary_features + ["Diabetes_012", "index"]]
@@ -131,7 +131,7 @@ def ingest_data(
     df_binary = df_full[["index", "datetime"] + binary_features]
     df_target = df_full[["index", "datetime", "Diabetes_012"]]
 
-    # Use Great Expectations project
+
     context = get_context()
 
     def validate_with_suite(data: pd.DataFrame, suite_name: str, asset_name: str):
