@@ -4,6 +4,8 @@
 ingestion:
   target_column: "Diabetes_012"
 
+build_data_docs: True
+
 to_feature_store: False
 
 feature_selection:

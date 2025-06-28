@@ -1,6 +1,6 @@
 from kedro.pipeline import Pipeline, node, pipeline
 
-from .nodes import ingest_data, build_expectation_suite
+from .nodes import ingest_data
 
 
 def create_pipeline(**kwargs) -> Pipeline:

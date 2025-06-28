@@ -5,7 +5,7 @@ import great_expectations as ge
 from typing import Dict, Any
 from great_expectations.core import ExpectationSuite
 import pickle
-
+from great_expectations.core.batch import RuntimeBatchRequest
 from pathlib import Path
 
 from kedro.config import OmegaConfigLoader
@@ -14,6 +14,12 @@ from kedro.framework.project import settings
 conf_path = str(Path("") / settings.CONF_SOURCE)
 conf_loader = OmegaConfigLoader(conf_source=conf_path)
 credentials = conf_loader["credentials"]
+
+import pandas as pd
+import logging
+from typing import Dict, Any
+from great_expectations.data_context import get_context
+from great_expectations.core.batch import BatchRequest
 
 logger = logging.getLogger(__name__)
 
@@ -101,61 +107,10 @@ def build_expectation_suite(expectation_suite_name: str, feature_group: str, ava
 
 
 
-def to_feature_store(
-    data: pd.DataFrame,
-    group_name: str,
-    feature_group_version: int,
-    description: str,
-    group_description: list,
-    validation_expectation_suite: ExpectationSuite,
-    credentials_input: dict
-):
-    
-    import hopsworks
-    
-    project = hopsworks.login(
-        api_key_value=credentials_input["FS_API_KEY"],
-        project=credentials_input["FS_PROJECT_NAME"]
-    )
-    feature_store = project.get_feature_store()
-
-    feature_group = feature_store.get_or_create_feature_group(
-        name=group_name,
-        version=feature_group_version,
-        description=description,
-        primary_key=["index"],
-        event_time="datetime",
-        online_enabled=False,
-        expectation_suite=validation_expectation_suite,
-    )
-
-    feature_group.insert(
-        features=data,
-        overwrite=False,
-        write_options={"wait_for_job": True}
-    )
-
-    for feature in group_description:
-        feature_group.update_feature_description(feature["name"], feature["description"])
-
-    feature_group.statistics_config = {
-        "enabled": True,
-        "histograms": True,
-        "correlations": True,
-    }
-    feature_group.update_statistics_config()
-    feature_group.compute_statistics()
-
-    logger.info(f"Successfully saved '{group_name}' to Hopsworks Feature Store.")
-    return feature_group
-
-
 def ingest_data(
     patients: pd.DataFrame,
     parameters: Dict[str, Any]
 ) -> pd.DataFrame:
-    import logging
-    logger = logging.getLogger(__name__)
 
     df_full = patients.copy()
     df_full = df_full.reset_index()
@@ -176,20 +131,40 @@ def ingest_data(
     df_binary = df_full[["index", "datetime"] + binary_features]
     df_target = df_full[["index", "datetime", "Diabetes_012"]]
 
-    # Validate entire df_full with GE (optional safety)
-    import great_expectations as ge
-    ge_df = ge.from_pandas(df_full)
-    for suite in [
-        save_expectation_suite(build_expectation_suite("numerical_suite", "numerical_features", df_numerical.columns.tolist()), "numerical_suite.pkl"),
-        save_expectation_suite(build_expectation_suite("binary_suite", "binary_features", df_binary.columns.tolist()), "binary_suite.pkl"),
-        save_expectation_suite(build_expectation_suite("target_suite", "target", df_target.columns.tolist()), "target_suite.pkl")
-    ]:
-        result = ge_df.validate(expectation_suite=suite)
-        if not result.success:
-            logger.error("GE validation failed.")
-            raise ValueError("Great Expectations validation failed.")
-    logger.info("GE validation passed.")
+    # Use Great Expectations project
+    context = get_context()
 
+    def validate_with_suite(data: pd.DataFrame, suite_name: str, asset_name: str):
+        batch_request = RuntimeBatchRequest(
+            datasource_name="my_pandas_datasource",
+            data_connector_name="default_runtime_data_connector_name",
+            data_asset_name=asset_name,
+            runtime_parameters={"batch_data": data},
+            batch_identifiers={"default_identifier_name": "default"},
+        )
+
+        validator = context.get_validator(
+            batch_request=batch_request,
+            expectation_suite_name=suite_name
+        )
+
+        result = validator.validate()
+        if not result.success:
+            raise ValueError(f"Great Expectations validation failed for suite: {suite_name}")
+
+    # Validate each group with corresponding suite
+    validate_with_suite(df_numerical, "numerical_suite", "numerical_features")
+    validate_with_suite(df_binary, "binary_suite", "binary_features")
+    validate_with_suite(df_target, "target_suite", "target_features")
+
+    logger.info("✅ All Great Expectations validations passed.")
+
+    # (Optional) Build Data Docs if desired
+    if parameters.get("build_data_docs", False):
+        context.build_data_docs()
+        logger.info("Data Docs built successfully.")
+
+    return df_full
     # # Store in Hopsworks if flag is set
     # if parameters.get("to_feature_store", True):
     #     from pathlib import Path
@@ -231,4 +206,3 @@ def ingest_data(
     #         credentials_input=credentials_input
     #     )
 
-    return df_full
