@@ -105,6 +105,54 @@ def build_expectation_suite(expectation_suite_name: str, feature_group: str, ava
 
     return expectation_suite
 
+def to_feature_store(
+    data: pd.DataFrame,
+    group_name: str,
+    feature_group_version: int,
+    description: str,
+    group_description: list,
+    validation_expectation_suite: ExpectationSuite,
+    credentials_input: dict
+):
+    
+    import hopsworks
+    
+    project = hopsworks.login(
+        api_key_value=credentials_input["FS_API_KEY"],
+        project=credentials_input["FS_PROJECT_NAME"]
+    )
+    feature_store = project.get_feature_store()
+
+    feature_group = feature_store.get_or_create_feature_group(
+        name=group_name,
+        version=feature_group_version,
+        description=description,
+        primary_key=["index"],
+        event_time="datetime",
+        online_enabled=False,
+        expectation_suite=validation_expectation_suite,
+    )
+
+    feature_group.insert(
+        features=data,
+        overwrite=False,
+        write_options={"wait_for_job": True}
+    )
+
+    for feature in group_description:
+        feature_group.update_feature_description(feature["name"], feature["description"])
+
+    feature_group.statistics_config = {
+        "enabled": True,
+        "histograms": True,
+        "correlations": True,
+    }
+    feature_group.update_statistics_config()
+    feature_group.compute_statistics()
+
+    logger.info(f"Successfully saved '{group_name}' to Hopsworks Feature Store.")
+    return feature_group
+
 
 
 def ingest_data(
@@ -157,52 +205,53 @@ def ingest_data(
     validate_with_suite(df_binary, "binary_suite", "binary_features")
     validate_with_suite(df_target, "target_suite", "target_features")
 
-    logger.info("✅ All Great Expectations validations passed.")
+    logger.info("All Great Expectations validations passed.")
 
-    # (Optional) Build Data Docs if desired
+
+
+    # from pathlib import Path
+    # from kedro.config import OmegaConfigLoader
+    # from kedro.framework.project import settings
+
+    # conf_path = str(Path("") / settings.CONF_SOURCE)
+    # conf_loader = OmegaConfigLoader(conf_source=conf_path)
+    # credentials_input = conf_loader["credentials"]["feature_store"]
+
+
+    # to_feature_store(
+    #     data=df_numerical,
+    #     group_name="numerical_features",
+    #     feature_group_version=1,
+    #     description="Numerical features from diabetes dataset",
+    #     group_description=[],
+    #     validation_expectation_suite=build_expectation_suite("numerical_suite", "numerical_features", df_numerical.columns.tolist()),
+    #     credentials_input=credentials_input
+    # )
+
+    # to_feature_store(
+    #     data=df_binary,
+    #     group_name="binary_features",
+    #     feature_group_version=1,
+    #     description="Binary features from diabetes dataset",
+    #     group_description=[],
+    #     validation_expectation_suite=build_expectation_suite("binary_suite", "binary_features", df_binary.columns.tolist()),
+    #     credentials_input=credentials_input
+    # )
+
+    # to_feature_store(
+    #     data=df_target,
+    #     group_name="target_features",
+    #     feature_group_version=1,
+    #     description="Target variable from diabetes dataset",
+    #     group_description=[],
+    #     validation_expectation_suite=build_expectation_suite("target_suite", "target", df_target.columns.tolist()),
+    #     credentials_input=credentials_input
+    # )
+
+            
     if parameters.get("build_data_docs", False):
         context.build_data_docs()
         logger.info("Data Docs built successfully.")
 
     return df_full
-    # # Store in Hopsworks if flag is set
-    # if parameters.get("to_feature_store", True):
-    #     from pathlib import Path
-    #     from kedro.config import OmegaConfigLoader
-    #     from kedro.framework.project import settings
-
-    #     conf_path = str(Path("") / settings.CONF_SOURCE)
-    #     conf_loader = OmegaConfigLoader(conf_source=conf_path)
-    #     credentials_input = conf_loader["credentials"]["feature_store"]
-
-
-    #     to_feature_store(
-    #         data=df_numerical,
-    #         group_name="numerical_features",
-    #         feature_group_version=1,
-    #         description="Numerical features from diabetes dataset",
-    #         group_description=[],
-    #         validation_expectation_suite=build_expectation_suite("numerical_suite", "numerical_features", df_numerical.columns.tolist()),
-    #         credentials_input=credentials_input
-    #     )
-
-    #     to_feature_store(
-    #         data=df_binary,
-    #         group_name="binary_features",
-    #         feature_group_version=1,
-    #         description="Binary features from diabetes dataset",
-    #         group_description=[],
-    #         validation_expectation_suite=build_expectation_suite("binary_suite", "binary_features", df_binary.columns.tolist()),
-    #         credentials_input=credentials_input
-    #     )
-
-    #     to_feature_store(
-    #         data=df_target,
-    #         group_name="target_features",
-    #         feature_group_version=1,
-    #         description="Target variable from diabetes dataset",
-    #         group_description=[],
-    #         validation_expectation_suite=build_expectation_suite("target_suite", "target", df_target.columns.tolist()),
-    #         credentials_input=credentials_input
-    #     )
 

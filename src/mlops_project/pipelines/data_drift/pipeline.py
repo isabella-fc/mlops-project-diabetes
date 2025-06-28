@@ -7,8 +7,8 @@ def create_pipeline(**kwargs):
             node(
                 func=data_drift_report,
                 inputs=dict(
-                    reference_data="reference_dataset",
-                    current_data="patients",
+                    reference_data="reference_dataset_preprocessed",
+                    current_data="current_dataset",
                     output_path="params:data_drift_report_path"
                 ),
                 outputs=None,

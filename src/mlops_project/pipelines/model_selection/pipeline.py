@@ -9,7 +9,7 @@ def create_pipeline(**kwargs) -> Pipeline:
             inputs=[
                 "X_train_fe",  
                 "X_test_fe",
-                "y_train_balanced",
+                "y_train_matched",
                 "y_test",
                 "champion_dict",
                 "champion_model",

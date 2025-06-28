@@ -5,8 +5,8 @@ def create_pipeline(**kwargs) -> Pipeline:
     return pipeline([
         node(
             func=feature_selection,
-            inputs=["X_train_fe", "y_train", "params:feature_selection"],
-            outputs="selected_features",
+            inputs=["X_train_fe", "y_train_matched", "params:feature_selection"],
+            outputs="selected_features, ",
             name="feature_selection_node"
         )
     ])

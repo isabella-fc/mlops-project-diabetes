@@ -6,6 +6,8 @@ import pickle
 from typing import Dict, Any
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import RFE
+import time
+name_suffix = "_" + time.strftime("%Y%m%d_%H%M%S")
 
 
 def feature_selection(X_train: pd.DataFrame, y_train: pd.DataFrame, parameters: Dict[str, Any]) -> list[str]:
@@ -27,11 +29,16 @@ def feature_selection(X_train: pd.DataFrame, y_train: pd.DataFrame, parameters: 
 
         rfe = RFE(classifier)
         rfe = rfe.fit(X_train, y_train)
-        f = rfe.get_support(1)  # selected features
+        f = rfe.get_support(1)  
         X_cols = X_train.columns[f].tolist()
     else:
         raise ValueError("Unsupported feature_selection method: only 'rfe' is currently implemented.")
 
     pd.Series(X_cols).to_csv("data/06_selected_features/selected_features_list.csv", index=False)
+
+    selected_df = X_train[X_cols]
+    df_path = f"data/06_selected_features/current_dataset.csv"
+    selected_df.to_csv(df_path, index=False)
+
     log.info(f"Selected {len(X_cols)} best features")
     return X_cols

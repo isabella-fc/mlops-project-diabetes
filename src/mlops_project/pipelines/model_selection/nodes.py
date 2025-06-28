@@ -52,7 +52,7 @@ def model_selection(
         "RandomForestClassifier": RandomForestClassifier(),
         "GradientBoostingClassifier": GradientBoostingClassifier(),
         "LogisticRegression": LogisticRegression(max_iter=1000),
-        "XGBClassifier": XGBClassifier(eval_metric="mlogloss", use_label_encoder=False)
+        "XGBClassifier": XGBClassifier(eval_metric="mlogloss")
     }
 
     results = {}
@@ -88,9 +88,27 @@ def model_selection(
         mlflow.log_metric("tuned_f1_macro", tuned_f1)
         mlflow.log_metric("tuned_accuracy", tuned_acc)
 
-    if champion_dict["test_score"] < tuned_f1:
-        logger.info(f"New champion! F1_macro = {tuned_f1:.4f} > {champion_dict['test_score']:.4f}")
-        return best_model
-    else:
-        logger.info(f"Champion remains. F1_macro = {tuned_f1:.4f} <= {champion_dict['test_score']:.4f}")
-        return champion_model
+        if champion_dict["test_score"] < tuned_f1:
+            logger.info(f"New champion! F1_macro = {tuned_f1:.4f} > {champion_dict['test_score']:.4f}")
+            with open("data/07_models/champion_dict.pkl", "wb") as f:
+                pickle.dump({"test_score": tuned_f1}, f)
+            with open("data/07_models/champion_model.pkl", "wb") as f:
+                pickle.dump(best_model, f)
+            return best_model
+        else:
+            logger.info(f"Champion remains. F1_macro = {tuned_f1:.4f} <= {champion_dict['test_score']:.4f}")
+            return champion_model if champion_model is not None else best_model  # ✅ fallback to something
+
+
+
+
+def load_or_init_champion() -> Tuple[Dict[str, Any], Any]:
+    try:
+        with open("data/07_models/champion_dict.pkl", "rb") as f:
+            champion_dict = pickle.load(f)
+        with open("data/07_models/champion_model.pkl", "rb") as f:
+            champion_model = pickle.load(f)
+    except FileNotFoundError:
+        champion_dict = {"test_score": 0.0}
+        champion_model = None
+    return champion_dict, champion_model

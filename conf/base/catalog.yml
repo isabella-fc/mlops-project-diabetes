@@ -2,7 +2,7 @@
 
 patients:
   type: pandas.CSVDataset
-  filepath: data/01_raw/diabetes_012_health_indicators_BRFSS2015_sample.csv
+  filepath: data/01_raw/sample_2.csv
 
 ingested_data:
   type: pandas.CSVDataset
@@ -50,9 +50,9 @@ X_test_processed:
   type: kedro_datasets.pandas.CSVDataset
   filepath: data/04_preprocessed/X_test_processed.csv
 
-y_train_balanced:
+y_train_matched:
   type: kedro_datasets.pandas.CSVDataset
-  filepath: data/04_preprocessed/y_train_balanced.csv
+  filepath: data/04_preprocessed/y_train_matched.csv
   save_args:
     index: False
 
@@ -123,7 +123,11 @@ output_plot:
     filepath: data/08_reporting/shap_plot.png
 
 
-reference_dataset:
+reference_dataset_preprocessed:
   type: kedro_datasets.pandas.CSVDataset
-  filepath: data/08_reporting/reference.csv
+  filepath: data/06_selected_features/reference_preprocessed.csv
+
+current_dataset:
+  type: kedro_datasets.pandas.CSVDataset
+  filepath: data/06_selected_features/current_dataset.csv
 
