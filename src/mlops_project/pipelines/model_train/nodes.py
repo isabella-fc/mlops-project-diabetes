@@ -22,7 +22,7 @@ warnings.filterwarnings(action="ignore", category=DataConversionWarning)
 def model_train(
     X_train: pd.DataFrame, 
     X_val: pd.DataFrame, 
-    y_train: pd.Series, 
+    y_train: pd.DataFrame, 
     y_val: pd.DataFrame,
     parameters: Dict[str, Any],
     best_columns: list[str]
